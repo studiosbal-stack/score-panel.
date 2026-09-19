@@ -3,9 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jor Punjab Da - Live Controller</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 15px; background: #222; color: white; margin: 0;}
-        .panel { background: #333; padding: 20px; border-radius: 8px; max-width: 100%; margin: auto; display: none;}
+        /* BASE STYLES */
+        body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        
+        /* ================= OBS VIEW STYLES ================= */
+        #obs-view { display: none; overflow: hidden; font-family: 'Arial Black', sans-serif; }
+        .watermark { position: absolute; font-size: 30px; color: rgba(255, 255, 255, 0.15); font-weight: bold; text-transform: uppercase; letter-spacing: 2px; animation: floatLogo 25s infinite alternate linear; pointer-events: none; z-index: 1000; }
+        @keyframes floatLogo { 0% { top: 10%; left: 5%; transform: scale(1); } 33% { top: 50%; left: 60%; transform: scale(1.1); } 66% { top: 80%; left: 30%; transform: scale(0.9); } 100% { top: 20%; left: 70%; transform: scale(1); } }
+        .lower-third-container { position: absolute; bottom: 0; width: 100%; height: 80px; background-color: #000000; border-bottom: 5px solid #005a9e; display: flex; font-size: 34px; line-height: 80px; }
+        .part { flex: 1; overflow: hidden; position: relative; white-space: nowrap; padding: 0 15px;}
+        .part1 { border-right: 2px solid white; text-align: center; color: #ffcc00; }
+        .part2 { border-right: 2px solid white; color: #ffffff; }
+        .part3 { color: #ffffff; }
+        .scroller { display: inline-block; padding-left: 100%; animation: scroll-left 15s linear infinite; }
+        @keyframes scroll-left { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+
+        /* ================= CONTROL PANEL STYLES ================= */
+        #admin-view { display: none; background: #222; color: white; min-height: 100vh; padding: 15px; box-sizing: border-box; }
+        .panel { background: #333; padding: 20px; border-radius: 8px; max-width: 600px; margin: auto; display: none;}
         .login-box { text-align: center; margin-top: 50px; }
         input { width: 100%; padding: 12px; margin-bottom: 15px; box-sizing: border-box; font-size: 16px; border-radius: 4px; border: none;}
         button { padding: 15px; width: 100%; margin-bottom: 10px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; font-size: 16px;}
@@ -13,32 +30,65 @@
         .update-btn { background: #0078d7; color: white; margin-top: 10px;}
         .pause-btn { background: #d9534f; color: white; }
         .play-btn { background: #5cb85c; color: white; }
+        .copy-btn { background: #ff9800; color: white; border: 2px dashed #fff; margin-top: 20px; }
         #userInfo { color: #ffcc00; margin-bottom: 15px; font-size: 14px; text-align: center;}
     </style>
 </head>
 <body>
-    <div class="login-box" id="loginBox">
-        <h2>Admin Login</h2><p>Please login with studiosbal@gmail.com</p>
-        <button class="login-btn" onclick="signIn()">🛡️ Login with Google</button>
-        <p id="errorMsg" style="color: red;"></p>
-    </div>
-    <div class="panel" id="controlPanel">
-        <h3 style="text-align:center; margin-top:0;">Mobile Score Controller</h3>
-        <div id="userInfo"></div>
-        <label>Part 1 (Static Box):</label><input type="text" id="input1" placeholder="e.g. LIVE STREAM">
-        <label>Part 2 (Scroll Line 1):</label><input type="text" id="input2" placeholder="e.g. OPEN | 2ND PRIZE: 0">
-        <label>Part 3 (Scroll Line 2):</label><input type="text" id="input3" placeholder="e.g. KABADDI 65KG FZR VS MUDKI">
-        <button class="update-btn" id="updateBtn" onclick="updateData()">Update OBS Live</button>
-        <div style="display: flex; gap: 10px; margin-top: 15px;">
-            <button class="pause-btn" onclick="setPause('yes')">Pause Scroll</button>
-            <button class="play-btn" onclick="setPause('no')">Play Scroll</button>
+
+    <!-- ================= OBS VIEW (Scoreboard) ================= -->
+    <div id="obs-view">
+        <div class="watermark">Jor Punjab Da</div>
+        <div class="lower-third-container">
+            <div class="part part1" id="box1">LIVE STREAM</div>
+            <div class="part part2"><div class="scroller" id="scroll2">Waiting for updates...</div></div>
+            <div class="part part3"><div class="scroller" id="scroll3">Waiting for updates...</div></div>
         </div>
-        <button onclick="signOut()" style="background: #555; color: white; margin-top: 20px;">Logout</button>
     </div>
+
+    <!-- ================= ADMIN VIEW (Mobile Control) ================= -->
+    <div id="admin-view">
+        <div class="login-box" id="loginBox">
+            <h2>Admin Login</h2>
+            <p>Please login with studiosbal@gmail.com</p>
+            <button class="login-btn" onclick="signIn()">🛡️ Login with Google</button>
+            <p id="errorMsg" style="color: red;"></p>
+        </div>
+
+        <div class="panel" id="controlPanel">
+            <h3 style="text-align:center; margin-top:0;">Mobile Score Controller</h3>
+            <div id="userInfo"></div>
+            
+            <label>Part 1 (Static Box):</label>
+            <input type="text" id="input1" placeholder="e.g. LIVE STREAM">
+            
+            <label>Part 2 (Scroll Line 1):</label>
+            <input type="text" id="input2" placeholder="e.g. OPEN | 2ND PRIZE: 0">
+            
+            <label>Part 3 (Scroll Line 2):</label>
+            <input type="text" id="input3" placeholder="e.g. KABADDI 65KG FZR VS MUDKI">
+
+            <button class="update-btn" id="updateBtn" onclick="updateData()">Update OBS Live</button>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="pause-btn" onclick="setPause('yes')">Pause Scroll</button>
+                <button class="play-btn" onclick="setPause('no')">Play Scroll</button>
+            </div>
+
+            <!-- NAYA BUTTON OBS LINK COPY KARNE KE LIYE -->
+            <button class="copy-btn" onclick="copyObsLink()">📋 Copy OBS Browser Link</button>
+
+            <button onclick="signOut()" style="background: #555; color: white; margin-top: 10px;">Logout</button>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
     <script>
+        // ================= FIREBASE CONFIG =================
        const firebaseConfig = {
   apiKey: "AIzaSyApBkjrOj1W7voyrLP7Vc2DbtnN5NvG4-c",
   authDomain: "jor-punjab-live.firebaseapp.com",
@@ -50,49 +100,102 @@
   measurementId: "G-0RCR8PM6EH"
 };
         firebase.initializeApp(firebaseConfig);
-        var auth = firebase.auth();
+        
         var database = firebase.database();
-        var currentPauseState = "no";
-        const allowedEmail = "studiosbal@gmail.com";
-        var provider = new firebase.auth.GoogleAuthProvider();
+        
+        // ================= SMART LINK LOGIC =================
+        // Check karte hain ki URL me "?view=obs" laga hai ya nahi
+        const isObsView = window.location.href.includes('?view=obs');
 
-        function signIn() { auth.signInWithPopup(provider).catch(function(error) { document.getElementById('errorMsg').innerText = error.message; }); }
-        function signOut() { auth.signOut(); }
-
-        auth.onAuthStateChanged(function(user) {
-            if (user) {
-                if(user.email === allowedEmail) {
-                    document.getElementById('loginBox').style.display = 'none';
-                    document.getElementById('controlPanel').style.display = 'block';
-                    document.getElementById('userInfo').innerText = "Logged in as: " + user.email;
-                    loadSavedData();
-                } else { document.getElementById('errorMsg').innerText = "Access Denied."; signOut(); }
-            } else {
-                document.getElementById('loginBox').style.display = 'block';
-                document.getElementById('controlPanel').style.display = 'none';
-            }
-        });
-
-        function loadSavedData() {
-            database.ref('scoreboard').once('value').then(function(snapshot) {
+        if (isObsView) {
+            // ===== 1. Agar OBS hai, toh Admin Panel chhupa do aur Scoreboard dikhao =====
+            document.body.style.backgroundColor = "transparent";
+            document.getElementById('obs-view').style.display = "block";
+            
+            // Firebase se data read karna
+            database.ref('scoreboard').on('value', function(snapshot) {
                 var data = snapshot.val();
                 if(data) {
-                    document.getElementById('input1').value = data.box1 || "";
-                    document.getElementById('input2').value = data.box2 || "";
-                    document.getElementById('input3').value = data.box3 || "";
-                    currentPauseState = data.isPaused || "no";
+                    document.getElementById('box1').innerText = data.box1;
+                    document.getElementById('scroll2').innerText = data.box2;
+                    document.getElementById('scroll3').innerText = data.box3;
+                    
+                    if(data.isPaused === "yes") {
+                        document.getElementById('scroll2').style.animationPlayState = 'paused';
+                        document.getElementById('scroll3').style.animationPlayState = 'paused';
+                    } else {
+                        document.getElementById('scroll2').style.animationPlayState = 'running';
+                        document.getElementById('scroll3').style.animationPlayState = 'running';
+                    }
                 }
             });
-        }
 
-        function updateData() {
-            var btn = document.getElementById('updateBtn');
-            btn.innerText = "Saving Data...";
-            database.ref('scoreboard').set({ box1: document.getElementById('input1').value, box2: document.getElementById('input2').value, box3: document.getElementById('input3').value, isPaused: currentPauseState }).then(() => {
-                btn.innerText = "Updated Live!"; setTimeout(() => btn.innerText = "Update OBS Live", 2000);
+        } else {
+            // ===== 2. Agar Normal hai, toh Admin Panel dikhao =====
+            document.getElementById('admin-view').style.display = "block";
+            var auth = firebase.auth();
+            var currentPauseState = "no";
+            const allowedEmail = "studiosbal@gmail.com";
+            var provider = new firebase.auth.GoogleAuthProvider();
+
+            function signIn() { auth.signInWithPopup(provider).catch(function(error) { document.getElementById('errorMsg').innerText = error.message; }); }
+            function signOut() { auth.signOut(); }
+
+            auth.onAuthStateChanged(function(user) {
+                if (user) {
+                    if(user.email === allowedEmail) {
+                        document.getElementById('loginBox').style.display = 'none';
+                        document.getElementById('controlPanel').style.display = 'block';
+                        document.getElementById('userInfo').innerText = "Logged in as: " + user.email;
+                        loadSavedData();
+                    } else { document.getElementById('errorMsg').innerText = "Access Denied. Only studiosbal@gmail.com allowed."; signOut(); }
+                } else {
+                    document.getElementById('loginBox').style.display = 'block';
+                    document.getElementById('controlPanel').style.display = 'none';
+                }
             });
+
+            function loadSavedData() {
+                database.ref('scoreboard').once('value').then(function(snapshot) {
+                    var data = snapshot.val();
+                    if(data) {
+                        document.getElementById('input1').value = data.box1 || "";
+                        document.getElementById('input2').value = data.box2 || "";
+                        document.getElementById('input3').value = data.box3 || "";
+                        currentPauseState = data.isPaused || "no";
+                    }
+                });
+            }
+
+            window.updateData = function() {
+                var btn = document.getElementById('updateBtn');
+                btn.innerText = "Saving Data...";
+                database.ref('scoreboard').set({ 
+                    box1: document.getElementById('input1').value, 
+                    box2: document.getElementById('input2').value, 
+                    box3: document.getElementById('input3').value, 
+                    isPaused: currentPauseState 
+                }).then(() => {
+                    btn.innerText = "Updated Live!"; 
+                    setTimeout(() => btn.innerText = "Update OBS Live", 2000);
+                });
+            };
+
+            window.setPause = function(state) { currentPauseState = state; updateData(); };
+
+            // ===== OBS LINK COPY FUNCTION =====
+            window.copyObsLink = function() {
+                // Link ke piche automatically "?view=obs" lag jayega
+                var obsLink = window.location.origin + window.location.pathname + "?view=obs";
+                
+                // Link Copy karna
+                navigator.clipboard.writeText(obsLink).then(function() {
+                    alert("OBS Browser Link Copied!\n\n" + obsLink + "\n\nIse apne PC (OBS Studio) me Browser Source me paste karein.");
+                }, function(err) {
+                    alert("Copy karne me error aaya. Link khud bana lein: " + obsLink);
+                });
+            };
         }
-        function setPause(state) { currentPauseState = state; updateData(); }
     </script>
 </body>
 </html>
