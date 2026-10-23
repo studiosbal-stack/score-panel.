@@ -6,19 +6,49 @@
     <title>Jor Punjab Da - Live Controller</title>
     <style>
         /* BASE STYLES */
-        body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        body { margin: 0; padding: 0; font-family: Arial, sans-serif; overflow: hidden;}
         
         /* ================= OBS VIEW STYLES ================= */
-        #obs-view { display: none; overflow: hidden; font-family: 'Arial Black', sans-serif; }
+        #obs-view { display: none; overflow: hidden; font-family: 'Arial Black', sans-serif; width: 100vw; height: 100vh;}
         .watermark { position: absolute; font-size: 30px; color: rgba(255, 255, 255, 0.15); font-weight: bold; text-transform: uppercase; letter-spacing: 2px; animation: floatLogo 25s infinite alternate linear; pointer-events: none; z-index: 1000; }
         @keyframes floatLogo { 0% { top: 10%; left: 5%; transform: scale(1); } 33% { top: 50%; left: 60%; transform: scale(1.1); } 66% { top: 80%; left: 30%; transform: scale(0.9); } 100% { top: 20%; left: 70%; transform: scale(1); } }
-        .lower-third-container { position: absolute; bottom: 0; width: 100%; height: 80px; background-color: #000000; border-bottom: 5px solid #005a9e; display: flex; font-size: 34px; line-height: 80px; }
-        .part { flex: 1; overflow: hidden; position: relative; white-space: nowrap; padding: 0 15px;}
-        .part1 { border-right: 2px solid white; text-align: center; color: #ffcc00; } /* Default Yellow */
-        .part2 { border-right: 2px solid white; color: #ffffff; } /* Default White */
-        .part3 { color: #ffffff; } /* Default White */
+        
+        /* LOWER THIRD CONTAINER (STATIC - HILEGA NAHI) */
+        .lower-third-container { 
+            position: absolute; bottom: 0; width: 100%; 
+            height: 110px; 
+            background-color: #000000; 
+            border-bottom: 8px solid #0b59a6; /* Right side background wala Blue Color */
+            display: flex; 
+            font-size: 42px; 
+            line-height: 110px; 
+        }
+        
+        .part { flex: 1; overflow: hidden; position: relative; white-space: nowrap; padding: 0 20px;}
+        .part1 { border-right: 3px solid white; text-align: center; color: #ffcc00; }
+        .part2 { border-right: 3px solid white; color: #ffffff; }
+        .part3 { color: #ffffff; }
+        
+        /* SCROLLER ANIMATION */
         .scroller { display: inline-block; padding-left: 100%; animation: scroll-left 15s linear infinite; }
         @keyframes scroll-left { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+
+        /* ================= NAYA: TEXT TRANSITION ANIMATIONS ================= */
+        .text-element {
+            display: inline-block;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Jab text update hoga toh ye classes apply hongi */
+        .text-hidden-swipe { opacity: 0; transform: translateY(40px); }
+        .text-hidden-fade { opacity: 0; }
+
+        /* TEXT DESIGN EFFECTS (Glow / Shadow) */
+        .effect-glow { text-shadow: 0 0 15px currentColor, 0 0 30px currentColor; }
+        .effect-shadow { text-shadow: 4px 4px 5px rgba(0,0,0,0.8); }
+
 
         /* ================= CONTROL PANEL STYLES ================= */
         #admin-view { display: none; background: #222; color: white; min-height: 100vh; padding: 15px; box-sizing: border-box; }
@@ -28,7 +58,7 @@
         .color-picker { padding: 0; height: 45px; cursor: pointer; border: 2px solid #555; }
         button { padding: 15px; width: 100%; margin-bottom: 10px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; font-size: 16px;}
         .login-btn { background: #ffffff; color: #333; }
-        .update-btn { background: #0078d7; color: white; margin-top: 10px;}
+        .update-btn { background: #0078d7; color: white; margin-top: 10px; font-size: 18px;}
         .pause-btn { background: #d9534f; color: white; }
         .play-btn { background: #5cb85c; color: white; }
         .copy-btn { background: #ff9800; color: white; border: 2px dashed #fff; margin-top: 20px; }
@@ -39,11 +69,11 @@
 
     <!-- ================= OBS VIEW (Scoreboard) ================= -->
     <div id="obs-view">
-        <div class="watermark">Jor Punjab Da</div>
-        <div class="lower-third-container">
-            <div class="part part1" id="box1">LIVE STREAM</div>
-            <div class="part part2"><div class="scroller" id="scroll2">Waiting for updates...</div></div>
-            <div class="part part3"><div class="scroller" id="scroll3">Waiting for updates...</div></div>
+        <div class="watermark" id="watermark-logo">Jor Punjab Da</div>
+        <div class="lower-third-container" id="lower-third">
+            <div class="part part1"><span id="box1" class="text-element">LIVE STREAM</span></div>
+            <div class="part part2"><div class="scroller" id="scroller2"><span id="scroll2" class="text-element">Waiting for updates...</span></div></div>
+            <div class="part part3"><div class="scroller" id="scroller3"><span id="scroll3" class="text-element">Waiting for updates...</span></div></div>
         </div>
     </div>
 
@@ -60,49 +90,65 @@
             <h3 style="text-align:center; margin-top:0;">Mobile Score Controller</h3>
             <div id="userInfo"></div>
             
-            <!-- TEXT INPUTS -->
             <label>Part 1 (Static Box):</label>
-            <input type="text" id="input1" placeholder="e.g. LIVE STREAM">
+            <input type="text" id="input1" placeholder="e.g. SANTU NANGAL">
             
             <label>Part 2 (Scroll Line 1):</label>
-            <input type="text" id="input2" placeholder="e.g. OPEN | 2ND PRIZE: 0">
+            <input type="text" id="input2" placeholder="e.g. KABADDI OPEN 2nd PRIZE">
             
             <label>Part 3 (Scroll Line 2):</label>
-            <input type="text" id="input3" placeholder="e.g. KABADDI 65KG FZR VS MUDKI">
+            <input type="text" id="input3" placeholder="e.g. ADVERTISEMENT DETAILS">
 
             <!-- COLOR CONTROLS -->
-            <label>Text Colors (Rang Select Karein):</label>
             <div style="display: flex; gap: 10px; margin-bottom: 15px;">
                 <div style="flex: 1; text-align: center;">
-                    <span style="font-size: 12px;">Part 1</span>
+                    <span style="font-size: 12px;">Color 1</span>
                     <input type="color" id="color1" class="color-picker" value="#ffcc00">
                 </div>
                 <div style="flex: 1; text-align: center;">
-                    <span style="font-size: 12px;">Part 2</span>
+                    <span style="font-size: 12px;">Color 2</span>
                     <input type="color" id="color2" class="color-picker" value="#ffffff">
                 </div>
                 <div style="flex: 1; text-align: center;">
-                    <span style="font-size: 12px;">Part 3</span>
+                    <span style="font-size: 12px;">Color 3</span>
                     <input type="color" id="color3" class="color-picker" value="#ffffff">
                 </div>
             </div>
 
+            <!-- NAYA: TEXT UPDATE TRANSITION -->
+            <label style="color:#00bcd4; font-weight:bold;">Text Change Style (Naya Text Kaise Aaye):</label>
+            <select id="textTransitionSelect">
+                <option value="swipe">Swipe Up (Niche se Swipe hoke)</option>
+                <option value="fade">Fade (Aram se badle)</option>
+                <option value="none">Normal (Direct Change)</option>
+            </select>
+
+            <!-- DESIGN EFFECT -->
+            <label style="color:#00bcd4; font-weight:bold;">Text Look (Design):</label>
+            <select id="effectSelect">
+                <option value="none">Normal (Koi Effect Nahi)</option>
+                <option value="glow">Glow Effect (Chamakta Text)</option>
+                <option value="shadow">Drop Shadow (Parchai)</option>
+            </select>
+
             <!-- SPEED CONTROL -->
             <label>Scroll Speed (Chalna Di Speed):</label>
-            <select id="speedSelect">
+            <select id="speedSelect" style="margin-bottom: 5px;">
                 <option value="10">Fast (Tez)</option>
                 <option value="15">Normal</option>
                 <option value="25">Slow (Holi)</option>
                 <option value="35">Very Slow (Bahut Holi)</option>
             </select>
 
-            <button class="update-btn" id="updateBtn" onclick="updateData()">Update OBS Live</button>
+            <!-- UPDATE TEXT BUTTON -->
+            <button class="update-btn" id="updateBtn" onclick="updateData()">Update Text in OBS</button>
             
-            <!-- PLAY / PAUSE BUTTONS -->
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button class="pause-btn" onclick="setPause('yes')">Pause Scroll</button>
-                <button class="play-btn" onclick="setPause('no')">Play Scroll</button>
+            <div style="display: flex; gap: 10px; margin-top: 15px; margin-bottom: 15px;">
+                <button class="pause-btn" onclick="setPause('yes')">⏸️ Pause Scroll</button>
+                <button class="play-btn" onclick="setPause('no')">▶️ Play Scroll</button>
             </div>
+
+            <hr style="border-color: #555;">
 
             <button class="copy-btn" onclick="copyObsLink()">📋 Copy OBS Browser Link</button>
             <button onclick="signOut()" style="background: #555; color: white; margin-top: 10px;">Logout</button>
@@ -117,59 +163,87 @@
     <script>
         // ================= FIREBASE CONFIG =================
         // YAHAN APNA ASLI FIREBASE CONFIG PASTE KAREIN
-       const firebaseConfig = {
-  apiKey: "AIzaSyApBkjrOj1W7voyrLP7Vc2DbtnN5NvG4-c",
-  authDomain: "jor-punjab-live.firebaseapp.com",
-  databaseURL: "https://jor-punjab-live-default-rtdb.firebaseio.com",
-  projectId: "jor-punjab-live",
-  storageBucket: "jor-punjab-live.firebasestorage.app",
-  messagingSenderId: "567455364157",
-  appId: "1:567455364157:web:b1ffea84c70fc02af92654",
-  measurementId: "G-0RCR8PM6EH"
-};
+       var firebaseConfig = {
+            apiKey: "AIzaSyApBkjrOj1W7voyrLP7Vc2DbtnN5NvG4-c",
+            authDomain: "jor-punjab-live.firebaseapp.com",
+            databaseURL: "https://jor-punjab-live-default-rtdb.firebaseio.com",
+            projectId: "jor-punjab-live",
+            storageBucket: "jor-punjab-live.firebasestorage.app",
+            messagingSenderId: "567455364157",
+            appId: "1:567455364157:web:b1ffea84c70fc02af92654",
+            measurementId: "G-0RCR8PM6EH"
+        };
+        };
         firebase.initializeApp(firebaseConfig);
-        
         var database = firebase.database();
         
         // ================= SMART LINK LOGIC =================
         const isObsView = window.location.href.includes('?view=obs');
 
         if (isObsView) {
-            // OBS View
             document.body.style.backgroundColor = "transparent";
             document.getElementById('obs-view').style.display = "block";
             
+            // Function to change text smoothly (Text Transition)
+            function updateTextSmoothly(elementId, newText, transitionType) {
+                var el = document.getElementById(elementId);
+                if (!el || el.innerText === newText) return; // Agar text same hai toh kuch mat karo
+
+                if (transitionType === 'none') {
+                    el.innerText = newText;
+                } else {
+                    // Purana text chupaao
+                    el.classList.add(transitionType === 'swipe' ? 'text-hidden-swipe' : 'text-hidden-fade');
+                    
+                    // 500ms baad naya text dalo aur dikhao
+                    setTimeout(() => {
+                        el.innerText = newText;
+                        el.classList.remove('text-hidden-swipe', 'text-hidden-fade');
+                    }, 500); 
+                }
+            }
+
             database.ref('scoreboard').on('value', function(snapshot) {
                 var data = snapshot.val();
                 if(data) {
-                    // Update Texts
-                    document.getElementById('box1').innerText = data.box1;
-                    document.getElementById('scroll2').innerText = data.box2;
-                    document.getElementById('scroll3').innerText = data.box3;
+                    var transitionType = data.textTransition || "swipe";
+                    var effectType = data.textEffect || "none";
+
+                    // 1. Text Update (With Smooth Swipe/Fade Transition)
+                    updateTextSmoothly('box1', data.box1, transitionType);
+                    updateTextSmoothly('scroll2', data.box2, transitionType);
+                    updateTextSmoothly('scroll3', data.box3, transitionType);
                     
-                    // Update Colors
+                    // 2. Color Update
                     document.getElementById('box1').style.color = data.color1 || "#ffcc00";
                     document.getElementById('scroll2').style.color = data.color2 || "#ffffff";
                     document.getElementById('scroll3').style.color = data.color3 || "#ffffff";
                     
-                    // Update Speed
-                    var speed = data.scrollSpeed || "15"; 
-                    document.getElementById('scroll2').style.animationDuration = speed + 's';
-                    document.getElementById('scroll3').style.animationDuration = speed + 's';
+                    // 3. Design Look (Glow/Shadow)
+                    var textElements = [document.getElementById('box1'), document.getElementById('scroll2'), document.getElementById('scroll3')];
+                    textElements.forEach(el => {
+                        el.classList.remove('effect-glow', 'effect-shadow');
+                        if(effectType !== 'none') el.classList.add('effect-' + effectType);
+                    });
 
-                    // Update Pause/Play Status
+                    // 4. Speed Update
+                    var speed = data.scrollSpeed || "15"; 
+                    document.getElementById('scroller2').style.animationDuration = speed + 's';
+                    document.getElementById('scroller3').style.animationDuration = speed + 's';
+
+                    // 5. Pause/Play Update
                     if(data.isPaused === "yes") {
-                        document.getElementById('scroll2').style.animationPlayState = 'paused';
-                        document.getElementById('scroll3').style.animationPlayState = 'paused';
+                        document.getElementById('scroller2').style.animationPlayState = 'paused';
+                        document.getElementById('scroller3').style.animationPlayState = 'paused';
                     } else {
-                        document.getElementById('scroll2').style.animationPlayState = 'running';
-                        document.getElementById('scroll3').style.animationPlayState = 'running';
+                        document.getElementById('scroller2').style.animationPlayState = 'running';
+                        document.getElementById('scroller3').style.animationPlayState = 'running';
                     }
                 }
             });
 
         } else {
-            // Admin Panel
+            // ADMIN PANEL LOGIC
             document.getElementById('admin-view').style.display = "block";
             var auth = firebase.auth();
             var currentPauseState = "no";
@@ -186,7 +260,7 @@
                         document.getElementById('controlPanel').style.display = 'block';
                         document.getElementById('userInfo').innerText = "Logged in as: " + user.email;
                         loadSavedData();
-                    } else { document.getElementById('errorMsg').innerText = "Access Denied. Only studiosbal@gmail.com allowed."; signOut(); }
+                    } else { document.getElementById('errorMsg').innerText = "Access Denied."; signOut(); }
                 } else {
                     document.getElementById('loginBox').style.display = 'block';
                     document.getElementById('controlPanel').style.display = 'none';
@@ -197,18 +271,15 @@
                 database.ref('scoreboard').once('value').then(function(snapshot) {
                     var data = snapshot.val();
                     if(data) {
-                        // Load Text Inputs
                         document.getElementById('input1').value = data.box1 || "";
                         document.getElementById('input2').value = data.box2 || "";
                         document.getElementById('input3').value = data.box3 || "";
-                        
-                        // Load Colors
                         document.getElementById('color1').value = data.color1 || "#ffcc00";
                         document.getElementById('color2').value = data.color2 || "#ffffff";
                         document.getElementById('color3').value = data.color3 || "#ffffff";
-                        
-                        // Load Speed
                         document.getElementById('speedSelect').value = data.scrollSpeed || "15"; 
+                        document.getElementById('textTransitionSelect').value = data.textTransition || "swipe"; 
+                        document.getElementById('effectSelect').value = data.textEffect || "none"; 
                         currentPauseState = data.isPaused || "no";
                     }
                 });
@@ -216,7 +287,8 @@
 
             window.updateData = function() {
                 var btn = document.getElementById('updateBtn');
-                btn.innerText = "Saving Data...";
+                btn.innerText = "Saving...";
+                
                 database.ref('scoreboard').set({ 
                     box1: document.getElementById('input1').value, 
                     box2: document.getElementById('input2').value, 
@@ -225,21 +297,26 @@
                     color2: document.getElementById('color2').value,
                     color3: document.getElementById('color3').value,
                     scrollSpeed: document.getElementById('speedSelect').value, 
-                    isPaused: currentPauseState 
+                    textTransition: document.getElementById('textTransitionSelect').value,
+                    textEffect: document.getElementById('effectSelect').value,
+                    isPaused: currentPauseState
                 }).then(() => {
                     btn.innerText = "Updated Live!"; 
-                    setTimeout(() => btn.innerText = "Update OBS Live", 2000);
+                    setTimeout(() => btn.innerText = "Update Text in OBS", 2000);
                 });
             };
 
-            window.setPause = function(state) { currentPauseState = state; updateData(); };
+            window.setPause = function(state) { 
+                currentPauseState = state; 
+                window.updateData(); 
+            };
 
             window.copyObsLink = function() {
                 var obsLink = window.location.origin + window.location.pathname + "?view=obs";
                 navigator.clipboard.writeText(obsLink).then(function() {
-                    alert("OBS Browser Link Copied!\n\n" + obsLink + "\n\nIse apne PC (OBS Studio) me Browser Source me paste karein.");
+                    alert("OBS Browser Link Copied!\n\n" + obsLink);
                 }, function(err) {
-                    alert("Copy karne me error aaya. Link khud bana lein: " + obsLink);
+                    alert("Error: " + obsLink);
                 });
             };
         }
