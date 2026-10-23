@@ -13,12 +13,12 @@
         .watermark { position: absolute; font-size: 30px; color: rgba(255, 255, 255, 0.15); font-weight: bold; text-transform: uppercase; letter-spacing: 2px; animation: floatLogo 25s infinite alternate linear; pointer-events: none; z-index: 1000; }
         @keyframes floatLogo { 0% { top: 10%; left: 5%; transform: scale(1); } 33% { top: 50%; left: 60%; transform: scale(1.1); } 66% { top: 80%; left: 30%; transform: scale(0.9); } 100% { top: 20%; left: 70%; transform: scale(1); } }
         
-        /* LOWER THIRD CONTAINER (STATIC - HILEGA NAHI) */
+        /* LOWER THIRD CONTAINER */
         .lower-third-container { 
             position: absolute; bottom: 0; width: 100%; 
             height: 110px; 
             background-color: #000000; 
-            border-bottom: 8px solid #0b59a6; /* Right side background wala Blue Color */
+            border-bottom: 8px solid #0b59a6; 
             display: flex; 
             font-size: 42px; 
             line-height: 110px; 
@@ -29,26 +29,17 @@
         .part2 { border-right: 3px solid white; color: #ffffff; }
         .part3 { color: #ffffff; }
         
-        /* SCROLLER ANIMATION */
         .scroller { display: inline-block; padding-left: 100%; animation: scroll-left 15s linear infinite; }
         @keyframes scroll-left { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-        /* ================= NAYA: TEXT TRANSITION ANIMATIONS ================= */
-        .text-element {
-            display: inline-block;
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        /* Jab text update hoga toh ye classes apply hongi */
+        /* TEXT TRANSITIONS */
+        .text-element { display: inline-block; transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; opacity: 1; transform: translateY(0); }
         .text-hidden-swipe { opacity: 0; transform: translateY(40px); }
         .text-hidden-fade { opacity: 0; }
 
-        /* TEXT DESIGN EFFECTS (Glow / Shadow) */
+        /* TEXT EFFECTS */
         .effect-glow { text-shadow: 0 0 15px currentColor, 0 0 30px currentColor; }
         .effect-shadow { text-shadow: 4px 4px 5px rgba(0,0,0,0.8); }
-
 
         /* ================= CONTROL PANEL STYLES ================= */
         #admin-view { display: none; background: #222; color: white; min-height: 100vh; padding: 15px; box-sizing: border-box; }
@@ -67,7 +58,7 @@
 </head>
 <body>
 
-    <!-- ================= OBS VIEW (Scoreboard) ================= -->
+    <!-- OBS VIEW -->
     <div id="obs-view">
         <div class="watermark" id="watermark-logo">Jor Punjab Da</div>
         <div class="lower-third-container" id="lower-third">
@@ -77,7 +68,7 @@
         </div>
     </div>
 
-    <!-- ================= ADMIN VIEW (Mobile Control) ================= -->
+    <!-- ADMIN VIEW -->
     <div id="admin-view">
         <div class="login-box" id="loginBox">
             <h2>Admin Login</h2>
@@ -99,7 +90,6 @@
             <label>Part 3 (Scroll Line 2):</label>
             <input type="text" id="input3" placeholder="e.g. ADVERTISEMENT DETAILS">
 
-            <!-- COLOR CONTROLS -->
             <div style="display: flex; gap: 10px; margin-bottom: 15px;">
                 <div style="flex: 1; text-align: center;">
                     <span style="font-size: 12px;">Color 1</span>
@@ -115,15 +105,13 @@
                 </div>
             </div>
 
-            <!-- NAYA: TEXT UPDATE TRANSITION -->
-            <label style="color:#00bcd4; font-weight:bold;">Text Change Style (Naya Text Kaise Aaye):</label>
+            <label style="color:#00bcd4; font-weight:bold;">Text Change Style:</label>
             <select id="textTransitionSelect">
                 <option value="swipe">Swipe Up (Niche se Swipe hoke)</option>
                 <option value="fade">Fade (Aram se badle)</option>
                 <option value="none">Normal (Direct Change)</option>
             </select>
 
-            <!-- DESIGN EFFECT -->
             <label style="color:#00bcd4; font-weight:bold;">Text Look (Design):</label>
             <select id="effectSelect">
                 <option value="none">Normal (Koi Effect Nahi)</option>
@@ -131,8 +119,7 @@
                 <option value="shadow">Drop Shadow (Parchai)</option>
             </select>
 
-            <!-- SPEED CONTROL -->
-            <label>Scroll Speed (Chalna Di Speed):</label>
+            <label>Scroll Speed:</label>
             <select id="speedSelect" style="margin-bottom: 5px;">
                 <option value="10">Fast (Tez)</option>
                 <option value="15">Normal</option>
@@ -140,7 +127,6 @@
                 <option value="35">Very Slow (Bahut Holi)</option>
             </select>
 
-            <!-- UPDATE TEXT BUTTON -->
             <button class="update-btn" id="updateBtn" onclick="updateData()">Update Text in OBS</button>
             
             <div style="display: flex; gap: 10px; margin-top: 15px; margin-bottom: 15px;">
@@ -149,7 +135,6 @@
             </div>
 
             <hr style="border-color: #555;">
-
             <button class="copy-btn" onclick="copyObsLink()">📋 Copy OBS Browser Link</button>
             <button onclick="signOut()" style="background: #555; color: white; margin-top: 10px;">Logout</button>
         </div>
@@ -161,9 +146,8 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // ================= FIREBASE CONFIG =================
-        // YAHAN APNA ASLI FIREBASE CONFIG PASTE KAREIN
-       var firebaseConfig = {
+        // ================= FIREBASE CONFIG (Already Fixed!) =================
+        var firebaseConfig = {
             apiKey: "AIzaSyApBkjrOj1W7voyrLP7Vc2DbtnN5NvG4-c",
             authDomain: "jor-punjab-live.firebaseapp.com",
             databaseURL: "https://jor-punjab-live-default-rtdb.firebaseio.com",
@@ -173,29 +157,24 @@
             appId: "1:567455364157:web:b1ffea84c70fc02af92654",
             measurementId: "G-0RCR8PM6EH"
         };
-        };
         firebase.initializeApp(firebaseConfig);
         var database = firebase.database();
         
-        // ================= SMART LINK LOGIC =================
+        // ================= LOGIC =================
         const isObsView = window.location.href.includes('?view=obs');
 
         if (isObsView) {
             document.body.style.backgroundColor = "transparent";
             document.getElementById('obs-view').style.display = "block";
             
-            // Function to change text smoothly (Text Transition)
             function updateTextSmoothly(elementId, newText, transitionType) {
                 var el = document.getElementById(elementId);
-                if (!el || el.innerText === newText) return; // Agar text same hai toh kuch mat karo
+                if (!el || el.innerText === newText) return; 
 
                 if (transitionType === 'none') {
                     el.innerText = newText;
                 } else {
-                    // Purana text chupaao
                     el.classList.add(transitionType === 'swipe' ? 'text-hidden-swipe' : 'text-hidden-fade');
-                    
-                    // 500ms baad naya text dalo aur dikhao
                     setTimeout(() => {
                         el.innerText = newText;
                         el.classList.remove('text-hidden-swipe', 'text-hidden-fade');
@@ -209,29 +188,24 @@
                     var transitionType = data.textTransition || "swipe";
                     var effectType = data.textEffect || "none";
 
-                    // 1. Text Update (With Smooth Swipe/Fade Transition)
                     updateTextSmoothly('box1', data.box1, transitionType);
                     updateTextSmoothly('scroll2', data.box2, transitionType);
                     updateTextSmoothly('scroll3', data.box3, transitionType);
                     
-                    // 2. Color Update
                     document.getElementById('box1').style.color = data.color1 || "#ffcc00";
                     document.getElementById('scroll2').style.color = data.color2 || "#ffffff";
                     document.getElementById('scroll3').style.color = data.color3 || "#ffffff";
                     
-                    // 3. Design Look (Glow/Shadow)
                     var textElements = [document.getElementById('box1'), document.getElementById('scroll2'), document.getElementById('scroll3')];
                     textElements.forEach(el => {
                         el.classList.remove('effect-glow', 'effect-shadow');
                         if(effectType !== 'none') el.classList.add('effect-' + effectType);
                     });
 
-                    // 4. Speed Update
                     var speed = data.scrollSpeed || "15"; 
                     document.getElementById('scroller2').style.animationDuration = speed + 's';
                     document.getElementById('scroller3').style.animationDuration = speed + 's';
 
-                    // 5. Pause/Play Update
                     if(data.isPaused === "yes") {
                         document.getElementById('scroller2').style.animationPlayState = 'paused';
                         document.getElementById('scroller3').style.animationPlayState = 'paused';
@@ -243,7 +217,6 @@
             });
 
         } else {
-            // ADMIN PANEL LOGIC
             document.getElementById('admin-view').style.display = "block";
             var auth = firebase.auth();
             var currentPauseState = "no";
@@ -288,7 +261,6 @@
             window.updateData = function() {
                 var btn = document.getElementById('updateBtn');
                 btn.innerText = "Saving...";
-                
                 database.ref('scoreboard').set({ 
                     box1: document.getElementById('input1').value, 
                     box2: document.getElementById('input2').value, 
